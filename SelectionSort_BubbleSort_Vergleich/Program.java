@@ -98,20 +98,24 @@ calcavg();
         for(int x =0;x<n-1;x++){
             int min = x;
             for(int y = x+1;y<n;y++){
-                vglss++;
+
                 if(array[y] < array[min]){
                     min = y;
 
 
                 }
+                vglss++;
 
 
 
             }
             int tempvar = array[min];
+            if(array[min]!= array[x]){
+                swapss++;
+            }
             array[min] = array[x];
             array[x] = tempvar;
-            swapss++;
+
 
         }
     }
