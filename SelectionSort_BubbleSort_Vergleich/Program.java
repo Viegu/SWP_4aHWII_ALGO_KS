@@ -1,4 +1,3 @@
-package Images;
 
 import java.sql.SQLOutput;
 import java.util.ArrayList;
@@ -6,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
-public class Algo{
+public class BubbleSort_SelectionSort_StableSelectionSort{
     public static int bubbleArray[] = new int[1000];
     public static int selectionS[] = new int[1000];
     public static int stableselectionS[] = new int[1000];
