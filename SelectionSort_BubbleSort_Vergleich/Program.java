@@ -1,19 +1,28 @@
+package Images;
+
 import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
-public class Vergleich_Sort_Algo {
+public class Algo{
     public static int bubbleArray[] = new int[1000];
     public static int selectionS[] = new int[1000];
+    public static int stableselectionS[] = new int[1000];
 
 
-   public static ArrayList<Integer> bubbleSortVergleiche = new ArrayList<Integer>();
+    public static ArrayList<Integer> bubbleSortVergleiche = new ArrayList<Integer>();
     public static ArrayList<Integer> bubbleSortTausche = new ArrayList<Integer>();
+    public static ArrayList<Long> bubbleSortTime = new ArrayList<Long>();
 
     public static ArrayList<Integer> selectionSortVergleiche = new ArrayList<Integer>();
     public static ArrayList<Integer> selectionSortTausche = new ArrayList<Integer>();
+    public static ArrayList<Long> selectionSortTime = new ArrayList<Long>();
+
+    public static ArrayList<Integer> stableselectionSortVergleiche = new ArrayList<Integer>();
+    public static ArrayList<Integer> stableselectionSortTausche = new ArrayList<Integer>();
+    public static ArrayList<Long> stableselectionSortTime = new ArrayList<Long>();
 
 
 
@@ -21,52 +30,76 @@ public class Vergleich_Sort_Algo {
     public static int swapbs=0;
     public static int vglss=0;
     public static int swapss=0;
+    public static int vglsss=0;
+    public static int swapsss=0;
+    public static long startTime=0, endTime=0,time=0;
 
 
     public static double bbsDurchschnittvergl;
     public static double bbsDurchschnitttausche;
+    public static long bbstime;
+
     public static double ssDurchschnittvergl;
     public static double ssDurchschnitttausche;
+    public static long sstime;
+
+    public static double stablessDurchschnittvergl;
+    public static double stablessDurchschnitttausche;
+    public static long ssstime;
+
     public static void main(String[] args) {
-for(int i = 0;i<100;i++){
-    makeArrays();
-    bubblesort(bubbleArray);
-    selectionSort(selectionS);
-    bubbleSortVergleiche.add(vglbs);
-    bubbleSortTausche.add(swapbs);
-    selectionSortVergleiche.add(vglss);
-    selectionSortTausche.add(swapss);
-    vglbs=0;
-    swapbs=0;
-    vglss=0;
-    swapss=0;
+        for(int i = 0;i<100;i++){
+            makeArrays();
+            bubblesort(bubbleArray);
+            selectionSort(selectionS);
+            stableSelectionSort(stableselectionS);
+            bubbleSortVergleiche.add(vglbs);
+            bubbleSortTausche.add(swapbs);
+            selectionSortVergleiche.add(vglss);
+            selectionSortTausche.add(swapss);
+            stableselectionSortVergleiche.add(vglsss);
+            stableselectionSortTausche.add(swapsss);
+            vglbs=0;
+            swapbs=0;
+            vglss=0;
+            swapss=0;
+            swapsss=0;
+            vglsss=0;
 
 
-}
-calcavg();
+        }
+        calcavg();
         Collections.sort(bubbleSortTausche);
         Collections.sort(selectionSortTausche);
+        Collections.sort(stableselectionSortTausche);
 
         System.out.println("Durchschnittstausche Bubblesort: "+bbsDurchschnitttausche);
         System.out.println("Durchschnittsvergleiche Bubblesort: "+bbsDurchschnittvergl);
         System.out.println("Median Tausche Bubblesort: "+ bubbleSortTausche.get((bubbleSortTausche.size()/2)));
-        System.out.println("");
+        System.out.println("Benötigte Durchschnittszeit(Millisekunden): "+bbstime);
+        System.out.println(" ");
         System.out.println("Durchschnittstausche SelectionSort: "+ssDurchschnitttausche);
         System.out.println("Durchschnittsvergleiche SelectionSort: "+ssDurchschnittvergl);
         System.out.println("Median Tausche Selectionsort: "+selectionSortTausche.get((selectionSortTausche.size()/2)));
+        System.out.println("Benötigte Durchschnittszeit(Millisekunden): "+sstime);
+        System.out.println(" ");
+        System.out.println("Durchschnittstausche StableSelectionSort: "+stablessDurchschnitttausche);
+        System.out.println("Durchschnittsvergleiche StableSelectionSort: "+stablessDurchschnittvergl);
+        System.out.println("Median Tausche StableSelectionsort: "+stableselectionSortTausche.get((stableselectionSortTausche.size()/2)));
+        System.out.println("Benötigte Durchschnittszeit(Millisekunden): "+ssstime);
 
 
 
 
-      //  for(int i =0;i<ssDurchschnitttausche)
-       // System.out.println(bubbleSortTausche);
+        //  for(int i =0;i<ssDurchschnitttausche)
+        // System.out.println(bubbleSortTausche);
 
 
     }
 
 
     public static void bubblesort(int array[]) {
-
+startTime = System.nanoTime();
         int n = array.length;
 
         for (int x = 0; x < n - 1; x++) {
@@ -80,7 +113,12 @@ calcavg();
                 vglbs++;
             }
         }
-
+endTime = System.nanoTime();
+        time = endTime-startTime;
+        bubbleSortTime.add(time);
+        startTime=0;
+        endTime=0;
+        time=0;
     }
 
     public static void makeArrays(){
@@ -89,11 +127,13 @@ calcavg();
             int a = rndm.nextInt(1000);
             bubbleArray[i] =a;
             selectionS[i]=a;
+            stableselectionS[i]=a;
 
         }
 
     }
     public static void selectionSort(int array[]){
+        startTime = System.nanoTime();
         int n = array.length;
         for(int x =0;x<n-1;x++){
             int min = x;
@@ -118,7 +158,49 @@ calcavg();
 
 
         }
+        endTime = System.nanoTime();
+        time = endTime-startTime;
+        selectionSortTime.add(time);
+        startTime=0;
+        endTime=0;
+        time=0;
     }
+
+    static void stableSelectionSort(int[] array)
+    {
+        startTime = System.nanoTime();
+        int lenght = array.length;
+
+        for (int i = 0; i < lenght - 1; i++)
+        {
+            int min = i;
+            for (int j = i + 1; j < lenght; j++){
+                if (array[min] > array[j]){
+                    vglsss++;
+                    min = j;
+                }
+            }
+
+
+            int key = array[min];
+            while (min > i){
+                array[min] = array[min - 1];
+                min--;
+            }
+
+            array[i] = key;
+            swapsss++;
+        }
+        endTime = System.nanoTime();
+        time = endTime-startTime;
+        stableselectionSortTime.add(time);
+        startTime=0;
+        endTime=0;
+        time=0;
+    }
+
+
+
 
     public static void calcavg(){
 
@@ -129,23 +211,71 @@ calcavg();
         }
         bbsDurchschnitttausche =tempvar/bubbleSortTausche.size();
         tempvar =0;
+
+
         //BubbleSortVergleiche
         for(int i = 0;i<bubbleSortVergleiche.size();i++){
             tempvar = tempvar+ bubbleSortVergleiche.get(i);
         }
         bbsDurchschnittvergl =tempvar/bubbleSortVergleiche.size();
         tempvar =0;
+
+
         //SelectionSortVergleiche
         for(int i = 0;i<selectionSortVergleiche.size();i++){
             tempvar = tempvar+ selectionSortVergleiche.get(i);
         }
         ssDurchschnittvergl =tempvar/selectionSortVergleiche.size();
         tempvar =0;
+
+
         //SelectionSortTausche
         for(int i = 0;i<selectionSortTausche.size();i++){
             tempvar = tempvar+ selectionSortTausche.get(i);
         }
         ssDurchschnitttausche =tempvar/selectionSortTausche.size();
+        tempvar=0;
+
+        //StableSS tausche
+        for(int i = 0;i<stableselectionSortTausche.size();i++){
+            tempvar = tempvar+ stableselectionSortTausche.get(i);
+        }
+        stablessDurchschnitttausche =tempvar/stableselectionSortTausche.size();
+        tempvar=0;
+
+        //StableSS vergleiche
+        for(int i = 0;i<stableselectionSortVergleiche.size();i++){
+            tempvar = tempvar+ stableselectionSortVergleiche.get(i);
+        }
+        stablessDurchschnittvergl =tempvar/stableselectionSortVergleiche.size();
+        tempvar =0;
+
+        //Alle zeiten
+        for(int i = 0;i<bubbleSortTime.size();i++){
+            tempvar = tempvar+ bubbleSortTime.get(i);
+        }
+        bbstime =(long)tempvar/bubbleSortTime.size();
+        tempvar =0;
+bbstime = bbstime/1000;
+
+
+        for(int i = 0;i<selectionSortTime.size();i++){
+            tempvar = tempvar+ selectionSortTime.get(i);
+        }
+        sstime =(long)tempvar/selectionSortTime.size();
+        tempvar =0;
+        sstime =sstime/1000;
+
+
+
+        for(int i = 0;i<stableselectionSortTime.size();i++){
+            tempvar = tempvar+ stableselectionSortTime.get(i);
+        }
+        ssstime =(long)tempvar/stableselectionSortTime.size();
+        ssstime =ssstime/1000;
+        tempvar =0;
+
+
 
 
     }
