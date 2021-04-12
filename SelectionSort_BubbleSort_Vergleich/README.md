@@ -9,5 +9,5 @@ Dieses Programm generiert 100 Arrays, welche mit 1000 zufälligen Ganzzahlen gef
 *  Durchschnittlich Benötigte Zeit
 
 
-![.](https://github.com/SpiritKingTV/SWP_4aHWII_ALGO_KS/blob/master/SelectionSort_BubbleSort_Vergleich/Bubblesort_ALGO.PNG)
+![.](https://github.com/SpiritKingTV/SWP_4aHWII_ALGO_KS/blob/master/SelectionSort_BubbleSort_Vergleich/Bubblesort_ALGOR.PNG)
 
