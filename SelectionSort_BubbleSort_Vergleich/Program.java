@@ -1,4 +1,4 @@
-
+package Images;
 
 import java.sql.SQLOutput;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
-public class Vergleich_Sort_Algo{
+public class Algo{
     public static int bubbleArray[] = new int[1000];
     public static int selectionS[] = new int[1000];
     public static int stableselectionS[] = new int[1000];
@@ -75,8 +75,17 @@ public class Vergleich_Sort_Algo{
             selectionSort(selectionS);
             stableSelectionSort(stableselectionS);
             insertionSort(insertionArray);
+            startTime = System.nanoTime();
             quickSort(qsArray, 0,qsArray.length-1);
+            endTime = System.nanoTime();
+            time = endTime - startTime;
+            QSTime.add(time);
+            startTime = 0;
+            endTime = 0;
+            time = 0;
+
             bubbleSortVergleiche.add(vglbs);
+
             bubbleSortTausche.add(swapbs);
             selectionSortVergleiche.add(vglss);
             selectionSortTausche.add(swapss);
@@ -100,29 +109,33 @@ public class Vergleich_Sort_Algo{
         System.out.println("Durchschnittstausche Bubblesort: " + bbsDurchschnitttausche);
         System.out.println("Durchschnittsvergleiche Bubblesort: " + bbsDurchschnittvergl);
         System.out.println("Median Tausche Bubblesort: " + bubbleSortTausche.get((bubbleSortTausche.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Millisekunden): " + bbstime);
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + bbstime);
         System.out.println(" ");
         System.out.println("Durchschnittstausche SelectionSort: " + ssDurchschnitttausche);
         System.out.println("Durchschnittsvergleiche SelectionSort: " + ssDurchschnittvergl);
         System.out.println("Median Tausche Selectionsort: " + selectionSortTausche.get((selectionSortTausche.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Millisekunden): " + sstime);
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + sstime);
         System.out.println(" ");
         System.out.println("Durchschnittstausche StableSelectionSort: " + stablessDurchschnitttausche);
         System.out.println("Durchschnittsvergleiche StableSelectionSort: " + stablessDurchschnittvergl);
         System.out.println("Median Tausche StableSelectionsort: " + stableselectionSortTausche.get((stableselectionSortTausche.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Millisekunden): " + ssstime);
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + ssstime);
         System.out.println("");
         System.out.println("Durchschnittstausche InsertionSort: " + insertionsorttausche);
         System.out.println("Durchschnittsvergleiche Insertionsort: " + insertionsortvergl);
         System.out.println("Median Tausche Insertionsort: " + InsertionSortTausch.get((InsertionSortTausch.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Millisekunden): " + istime);
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + istime);
         System.out.println("");
         System.out.println("Durchschnittstausche Quicksort: " + qstausche);
         System.out.println("Durchschnittsvergleiche Quicksort: " + qsvergleiche);
+        System.out.println("keine Ahnung wie das geht ");
         //System.out.println("Median Tausche Insertionsort: " + InsertionSortTausch.get((InsertionSortTausch.size() / 2)));
         System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + qstime);
         //System.out.println(InsertionSortTausch);
-       // System.out.println(InsertionSortVergleich);
+        // System.out.println(InsertionSortVergleich);
+
+
+
 
 
         //  for(int i =0;i<ssDurchschnitttausche)
@@ -153,6 +166,7 @@ public class Vergleich_Sort_Algo{
         startTime = 0;
         endTime = 0;
         time = 0;
+
     }
 
     public static void makeArrays() {
@@ -289,7 +303,7 @@ public class Vergleich_Sort_Algo{
 
     static void quickSort(int[] arr, int low, int high)
     {
-        startTime = System.nanoTime();
+
         if (low < high)
         {
 
@@ -300,12 +314,7 @@ public class Vergleich_Sort_Algo{
             quickSort(arr, low, pi - 1);
             quickSort(arr, pi + 1, high);
         }
-        endTime = System.nanoTime();
-        time = endTime - startTime;
-        QSTime.add(time);
-        startTime = 0;
-        endTime = 0;
-        time = 0;
+
     }
 
 
@@ -391,7 +400,7 @@ public class Vergleich_Sort_Algo{
         }
         bbstime = (long) tempvar / bubbleSortTime.size();
         tempvar = 0;
-        bbstime = bbstime / 1000;
+
 
 
         for (int i = 0; i < selectionSortTime.size(); i++) {
@@ -399,27 +408,28 @@ public class Vergleich_Sort_Algo{
         }
         sstime = (long) tempvar / selectionSortTime.size();
         tempvar = 0;
-        sstime = sstime / 1000;
+
 
 
         for (int i = 0; i < stableselectionSortTime.size(); i++) {
             tempvar = tempvar + stableselectionSortTime.get(i);
         }
         ssstime = (long) tempvar / stableselectionSortTime.size();
-        ssstime = ssstime / 1000;
+
         tempvar = 0;
 
         for (int i = 0; i < InsertionSortTime.size(); i++) {
             tempvar = tempvar + InsertionSortTime.get(i);
         }
         istime = (long) tempvar / InsertionSortTime.size();
-        istime = istime / 1000;
+
         tempvar=0;
         for(int i=0;i<QSTime.size();i++){
             tempvar=tempvar+QSTime.get(i);
         }
-        qstime= (long) tempvar;
+        qstime= (long) tempvar / QSTime.size();
         tempvar=0;
+
 
 
 
