@@ -6,11 +6,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
 
-public class Sort_vergleiche{
+public class Vergleich_Sort_Algo{
     public static int bubbleArray[] = new int[1000];
     public static int selectionS[] = new int[1000];
     public static int stableselectionS[] = new int[1000];
     public static int insertionArray[] = new int[1000];
+    public static int qsArray[]= new int[1000];
 
 
     public static ArrayList<Integer> bubbleSortVergleiche = new ArrayList<Integer>();
@@ -29,6 +30,10 @@ public class Sort_vergleiche{
     public static ArrayList<Integer> InsertionSortTausch = new ArrayList<Integer>();
     public static ArrayList<Long> InsertionSortTime = new ArrayList<Long>();
 
+    public static ArrayList<Integer> QSVergleich = new ArrayList<Integer>();
+    public static ArrayList<Integer> QSTausch = new ArrayList<Integer>();
+    public static ArrayList<Long> QSTime = new ArrayList<Long>();
+
 
     public static int vglbs = 0;
     public static int swapbs = 0;
@@ -38,6 +43,8 @@ public class Sort_vergleiche{
     public static int swapsss = 0;
     public static int swapis = 0;
     public static int vglis = 0;
+    public static int qsvgl = 0;
+    public static int qsswap = 0;
     public static long startTime = 0, endTime = 0, time = 0;
 
 
@@ -57,6 +64,10 @@ public class Sort_vergleiche{
     public static double insertionsorttausche;
     public static long istime;
 
+    public static double qsvergleiche;
+    public static double qstausche;
+    public static long qstime;
+
     public static void main(String[] args) {
         for (int i = 0; i < 100; i++) {
             makeArrays();
@@ -64,6 +75,7 @@ public class Sort_vergleiche{
             selectionSort(selectionS);
             stableSelectionSort(stableselectionS);
             insertionSort(insertionArray);
+            quickSort(qsArray, 0,qsArray.length-1);
             bubbleSortVergleiche.add(vglbs);
             bubbleSortTausche.add(swapbs);
             selectionSortVergleiche.add(vglss);
@@ -72,6 +84,8 @@ public class Sort_vergleiche{
             stableselectionSortTausche.add(swapsss);
             InsertionSortTausch.add(swapis);
             InsertionSortVergleich.add(vglis);
+            QSTausch.add(qsswap);
+            QSVergleich.add(qsvgl);
             clearIt();
 
 
@@ -102,8 +116,13 @@ public class Sort_vergleiche{
         System.out.println("Durchschnittsvergleiche Insertionsort: " + insertionsortvergl);
         System.out.println("Median Tausche Insertionsort: " + InsertionSortTausch.get((InsertionSortTausch.size() / 2)));
         System.out.println("Benötigte Durchschnittszeit(Millisekunden): " + istime);
-        System.out.println(InsertionSortTausch);
-        System.out.println(InsertionSortVergleich);
+        System.out.println("");
+        System.out.println("Durchschnittstausche Quicksort: " + qstausche);
+        System.out.println("Durchschnittsvergleiche Quicksort: " + qsvergleiche);
+        //System.out.println("Median Tausche Insertionsort: " + InsertionSortTausch.get((InsertionSortTausch.size() / 2)));
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + qstime);
+        //System.out.println(InsertionSortTausch);
+       // System.out.println(InsertionSortVergleich);
 
 
         //  for(int i =0;i<ssDurchschnitttausche)
@@ -144,6 +163,7 @@ public class Sort_vergleiche{
             selectionS[i] = a;
             stableselectionS[i] = a;
             insertionArray[i]=a;
+            qsArray[i]=a;
 
         }
 
@@ -235,6 +255,58 @@ public class Sort_vergleiche{
         endTime = 0;
         time = 0;
     }
+    static void swap(int[] arr, int i, int j)
+    {
+        int temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
+    }
+
+    static int partition(int[] arr, int low, int high)
+    {
+
+        // pivot
+        int pivot = arr[high];
+
+
+        int i = (low - 1);
+
+        for(int j = low; j <= high - 1; j++)
+        {
+
+
+            if (arr[j] < pivot)
+            {
+
+
+                i++;
+                swap(arr, i, j);
+            }
+        }
+        swap(arr, i + 1, high);
+        return (i + 1);
+    }
+
+    static void quickSort(int[] arr, int low, int high)
+    {
+        startTime = System.nanoTime();
+        if (low < high)
+        {
+
+
+            int pi = partition(arr, low, high);
+
+
+            quickSort(arr, low, pi - 1);
+            quickSort(arr, pi + 1, high);
+        }
+        endTime = System.nanoTime();
+        time = endTime - startTime;
+        QSTime.add(time);
+        startTime = 0;
+        endTime = 0;
+        time = 0;
+    }
 
 
     public static void calcavg() {
@@ -299,6 +371,18 @@ public class Sort_vergleiche{
         insertionsorttausche = tempvar / InsertionSortTausch.size();
         tempvar = 0;
 
+        //Quicksort
+        for(int i=0;i< QSVergleich.size();i++){
+            tempvar = tempvar/QSVergleich.get(i);
+        }
+        qsvergleiche = tempvar/QSVergleich.size();
+        tempvar=0;
+        for(int i=0;i< QSTausch.size();i++){
+            tempvar = tempvar/QSTausch.get(i);
+        }
+        qstausche = tempvar/QSTausch.size();
+        tempvar=0;
+
 
 
         //Alle zeiten
@@ -330,6 +414,12 @@ public class Sort_vergleiche{
         }
         istime = (long) tempvar / InsertionSortTime.size();
         istime = istime / 1000;
+        tempvar=0;
+        for(int i=0;i<QSTime.size();i++){
+            tempvar=tempvar+QSTime.get(i);
+        }
+        qstime= (long) tempvar;
+        tempvar=0;
 
 
 
@@ -344,5 +434,8 @@ public class Sort_vergleiche{
         vglsss = 0;
         swapis = 0;
         vglis = 0;
+
+        qsswap=0;
+        qsvgl=0;
     }
 }
