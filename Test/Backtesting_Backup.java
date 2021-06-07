@@ -12,7 +12,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Scanner;
-
+enum StockStrats{
+    Hold,Cycle,Cycle3,
+}
 public class Program {
     //DataBase Stuff
     public static String dbURL = "jdbc:mysql://localhost:3306/stocks?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
@@ -21,6 +23,7 @@ public class Program {
 
     //  Values
     public static String selectedStock;
+    public static LocalDate StartDateMinusOne;
     public static double startMoney;
     public static LocalDate startDate;
     private static Scanner reader = new Scanner(System.in);
@@ -31,12 +34,11 @@ public class Program {
 
         connectToDB();
         input();
-       createTable(selectedStock);
-        sillyDbEntry(selectedStock, startMoney);
-        buyAndHold(selectedStock, startMoney, startDate);
-        // cycleSimulationNormal(selectedStock);
-        //cycleSimulationWithPercent(selectedStock);
-        calcProfit(selectedStock);
+      TableSetup();
+        buyAndHold(selectedStock, startMoney, startDate,StockStrats.Hold);
+         cycleSimulationNormal(selectedStock,StockStrats.Cycle);
+        cycleSimulationWithPercent(selectedStock,StockStrats.Cycle3);
+      outPut();
 
 
     }
@@ -57,14 +59,15 @@ public class Program {
         startMoney = reader.nextDouble();
         System.out.print("Start-date [yyyy-mm-dd]: ");
         startDate = LocalDate.parse(reader.next());
+        StartDateMinusOne = startDate.minusDays(1);
     }
 
-    public static void createTable(String unternehmen) throws SQLException {
+    public static void createTable(String unternehmen, StockStrats strat) throws SQLException {
         try {
             myStmt = connection.createStatement();
             //true -> 1 -> buy
             //false -> 0 -> sell
-            String command = "create Table if not Exists " + unternehmen + "_Sim" + "(DateOfDay Date primary key, action boolean, depot Double, Money double);";
+            String command = "create Table if not Exists " + unternehmen + "_Sim_" + strat+" (DateOfDay Date primary key, action boolean, depot Double, Money double);";
             myStmt.executeUpdate(command);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -72,14 +75,14 @@ public class Program {
 
     }
 
-    public static void sillyDbEntry(String unternehmen, double startMoney) {
-        LocalDate sillyDate = LocalDate.parse("1111-11-11");
+    public static void sillyDbEntry(String unternehmen, double startMoney,StockStrats strat) {
+   //     LocalDate sillyDate = LocalDate.parse("1111-11-11");
 
 
-        String sql = "insert into " + unternehmen + "_Sim(DateOfDay,action,depot,Money) values(?,?,?,?)";
+        String sql = "insert into " + unternehmen + "_Sim_"+strat+" (DateOfDay,action,depot,Money) values(?,?,?,?)";
         try {
             PreparedStatement pstmt = connection.prepareStatement(sql);
-            pstmt.setString(1, sillyDate.toString());
+            pstmt.setString(1, StartDateMinusOne.toString());
             pstmt.setBoolean(2, Boolean.parseBoolean("false"));
             pstmt.setDouble(3, 0);
             pstmt.setDouble(4, startMoney);
@@ -104,7 +107,7 @@ public class Program {
 
     }
 
-    public static void cycleSimulationNormal(String unternehmen) {
+    public static void cycleSimulationNormal(String unternehmen, StockStrats strat) {
 
         double close, schnitt;
         String date;
@@ -118,32 +121,32 @@ public class Program {
                 close = rs.getDouble("CloseValue");
                 date = rs.getString("DateofValue");
                 schnitt = rs.getDouble("Schnitt");
-                if (boughtOrSoldBefore(unternehmen)) {
+                if (boughtOrSoldBefore(unternehmen,strat)) {
                     //true --> habe vorher gekauft -> will verkaufen
                     if (close < schnitt) {
-                        double sBefore = stocksBefore(unternehmen);
-                        double mBefore = moneyBefore(unternehmen);
+                        double sBefore = stocksBefore(unternehmen,strat);
+                        double mBefore = moneyBefore(unternehmen,strat);
                         double moneyAfterSell = mBefore + (close * sBefore);
-                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell);
+                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell,strat);
 
                     }
                 } else {
                     //false --> habe vorher verkauft -> will kaufen
                     if (close > schnitt && !date.equals(lastDay(unternehmen))) {
                         //insert und rechnung mit kaufen
-                        double mbefore = moneyBefore(unternehmen);
+                        double mbefore = moneyBefore(unternehmen,strat);
                         int roundedNumber = (int) (mbefore / close);
                         double stocksNow = roundedNumber;
                         double moneyleft = mbefore % close;
-                        buyOrSellInsert(unternehmen, date, stocksNow, moneyleft);
+                        buyOrSellInsert(unternehmen, date, stocksNow, moneyleft,strat);
                     }
                 }
                 if(date.equals(lastDay(unternehmen))){
-                    if(boughtOrSoldBefore(unternehmen)){
-                        double sBefore = stocksBefore(unternehmen);
-                        double mBefore = moneyBefore(unternehmen);
+                    if(boughtOrSoldBefore(unternehmen,strat)){
+                        double sBefore = stocksBefore(unternehmen,strat);
+                        double mBefore = moneyBefore(unternehmen,strat);
                         double moneyAfterSell = mBefore + (close * sBefore);
-                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell);
+                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell,strat);
                     }
 
                 }
@@ -156,7 +159,7 @@ public class Program {
 
     }
 
-    public static void buyAndHold(String unt, double sm, LocalDate sd) {
+    public static void buyAndHold(String unt, double sm, LocalDate sd,StockStrats strat) {
         double close = 0;
         double close2 = 0;
         String date1 = "", date2 = "";
@@ -174,7 +177,7 @@ public class Program {
             double depot = roundedNumber;
             double moneyRest = sm % close;
             //Insert
-            buyOrSellInsert(unt, date1, depot, moneyRest);
+            buyOrSellInsert(unt, date1, depot, moneyRest,strat);
 
             String sql2 = "Select * from " + unt + " order by DateOfValue desc limit 1";
             Statement stmt2 = connection.createStatement();
@@ -187,7 +190,7 @@ public class Program {
             }
 
             //Insert
-            buyOrSellInsert(unt, date2, 0.0, depot * close2);
+            buyOrSellInsert(unt, date2, 0.0, depot * close2,strat);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -196,12 +199,12 @@ public class Program {
 
     }
 
-    public static void buyOrSellInsert(String unt, String dateAtMoment, double stocks, double newMoney) {
-        String sql = "insert into " + unt + "_Sim(DateOfDay,action,depot,Money) values(?,?,?,?)";
+    public static void buyOrSellInsert(String unt, String dateAtMoment, double stocks, double newMoney,StockStrats strat) {
+        String sql = "insert into " + unt + "_Sim_"+strat+" (DateOfDay,action,depot,Money) values(?,?,?,?)";
         try {
             PreparedStatement pstmt = connection.prepareStatement(sql);
             pstmt.setString(1, dateAtMoment.toString());
-            pstmt.setBoolean(2, !boughtOrSoldBefore(unt));
+            pstmt.setBoolean(2, !boughtOrSoldBefore(unt,strat));
             pstmt.setDouble(3, stocks);
             pstmt.setDouble(4, newMoney);
             pstmt.executeUpdate();
@@ -212,9 +215,9 @@ public class Program {
 
     }
 
-    public static boolean boughtOrSoldBefore(String unt) {
+    public static boolean boughtOrSoldBefore(String unt,StockStrats strat) {
         boolean bOs = false;
-        String sql = "Select * from " + unt + "_Sim " + " order by DateOfDay desc limit 1";
+        String sql = "Select * from " + unt + "_Sim_" +strat+ " order by DateOfDay desc limit 1";
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
@@ -230,9 +233,9 @@ public class Program {
         return false;
     }
 
-    public static double stocksBefore(String unt) {
+    public static double stocksBefore(String unt,StockStrats strat) {
         double stocks = 0.0;
-        String sql = "Select * from " + unt + "_Sim " + " order by DateOfDay desc limit 1";
+        String sql = "Select * from " + unt + "_Sim_" +strat+ " order by DateOfDay desc limit 1";
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
@@ -249,9 +252,9 @@ public class Program {
 
     }
 
-    public static double moneyBefore(String unt) {
+    public static double moneyBefore(String unt,StockStrats strat) {
         double money = 0.0;
-        String sql = "Select * from " + unt + "_Sim " + " order by DateOfDay desc limit 1";
+        String sql = "Select * from " + unt + "_Sim_" +strat+ " order by DateOfDay desc limit 1";
         try {
             Statement stmt = connection.createStatement();
             ResultSet rs = stmt.executeQuery(sql);
@@ -294,7 +297,7 @@ public class Program {
 
     }
 
-    public static void cycleSimulationWithPercent(String unternehmen) {
+    public static void cycleSimulationWithPercent(String unternehmen,StockStrats strat) {
 
         double close, schnitt;
         String date;
@@ -308,32 +311,32 @@ public class Program {
                 close = rs.getDouble("CloseValue");
                 date = rs.getString("DateofValue");
                 schnitt = rs.getDouble("Schnitt");
-                if (boughtOrSoldBefore(unternehmen)) {
+                if (boughtOrSoldBefore(unternehmen,strat)) {
                     //true --> habe vorher gekauft -> will verkaufen
                     if (close < schnitt + (schnitt*0.03)) {
-                        double sBefore = stocksBefore(unternehmen);
-                        double mBefore = moneyBefore(unternehmen);
+                        double sBefore = stocksBefore(unternehmen,strat);
+                        double mBefore = moneyBefore(unternehmen,strat);
                         double moneyAfterSell = mBefore + (close * sBefore);
-                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell);
+                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell,strat);
 
                     }
                 } else {
                     //false --> habe vorher verkauft -> will kaufen
                     if (close > schnitt-(schnitt*0.03) && !date.equals(lastDay(unternehmen))) {
                         //insert und rechnung mit kaufen
-                        double mbefore = moneyBefore(unternehmen);
+                        double mbefore = moneyBefore(unternehmen,strat);
                         int roundedNumber = (int) (mbefore / close);
                         double stocksNow = roundedNumber;
                         double moneyleft = mbefore % close;
-                        buyOrSellInsert(unternehmen, date, stocksNow, moneyleft);
+                        buyOrSellInsert(unternehmen, date, stocksNow, moneyleft,strat);
                     }
                 }
                 if(date.equals(lastDay(unternehmen))){
-                    if(boughtOrSoldBefore(unternehmen)){
-                        double sBefore = stocksBefore(unternehmen);
-                        double mBefore = moneyBefore(unternehmen);
+                    if(boughtOrSoldBefore(unternehmen,strat)){
+                        double sBefore = stocksBefore(unternehmen,strat);
+                        double mBefore = moneyBefore(unternehmen,strat);
                         double moneyAfterSell = mBefore + (close * sBefore);
-                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell);
+                        buyOrSellInsert(unternehmen, date, 0.0, moneyAfterSell,strat);
                     }
 
                 }
@@ -347,36 +350,9 @@ public class Program {
 
     }
 
-    public static void methods() {
 
-        int choise = whichMethod();
-        switch (choise) {
-            case 1:
-                buyAndHold(selectedStock, startMoney, startDate);
-
-                break;
-
-            case 2:
-                cycleSimulationNormal(selectedStock);
-
-                break;
-
-            case 3:
-                System.out.println("Kommt noch");
-
-                break;
-
-            default:
-                System.out.println("Falsche eingabe");
-
-                break;
-
-        }
-
-    }
-
-    public static void calcProfit(String unt){
-        String sql = "select * from "+unt+"_sim order by DateOfDay asc limit 1";
+    public static void calcProfit(String unt,StockStrats strat){
+        String sql = "select * from "+unt+"_sim_"+strat+" order by DateOfDay asc limit 1";
         double moneybefore=0,moneyafter=0;
         try{
             Statement stmt = connection.createStatement();
@@ -389,7 +365,7 @@ public class Program {
             e.printStackTrace();
         }
 
-        String sql2 = "select * from "+unt+"_sim order by DateOfDay desc limit 1";
+        String sql2 = "select * from "+unt+"_sim_"+strat+" order by DateOfDay desc limit 1";
         try{
             Statement stmt2 = connection.createStatement();
             ResultSet rs2 = stmt2.executeQuery(sql2);
@@ -399,9 +375,34 @@ public class Program {
         }catch(SQLException e){
             e.printStackTrace();
         }
-        System.out.println("Nach der Simulation hast du "+(moneyafter/moneybefore*100)+ " % vom Startkapital");
+        System.out.println("Nach der Simulation von "+usedStratName(strat)+" hast du "+(moneyafter/moneybefore*100)+ " % vom Startkapital");
 
     }
+    public static String usedStratName(StockStrats s){
+        switch (s){
+            case Hold:
+                return "Buy and Hold";
+            case Cycle:
+                return "200er Strategie";
+            case Cycle3:
+                return "200er Strategie mit 3% Toleranz";
+        }
+        return "Error";
+    }
 
+    public static void TableSetup() throws SQLException {
+        createTable(selectedStock,StockStrats.Hold);
+        createTable(selectedStock,StockStrats.Cycle);
+        createTable(selectedStock,StockStrats.Cycle3);
+        sillyDbEntry(selectedStock, startMoney,StockStrats.Hold);
+        sillyDbEntry(selectedStock, startMoney,StockStrats.Cycle);
+        sillyDbEntry(selectedStock, startMoney,StockStrats.Cycle3);
+    }
+
+    public static void outPut(){
+        calcProfit(selectedStock,StockStrats.Hold);
+        calcProfit(selectedStock,StockStrats.Cycle);
+        calcProfit(selectedStock,StockStrats.Cycle3);
+    }
 }
 
