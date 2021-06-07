@@ -33,12 +33,26 @@ public class Program {
     public static void main(String[] args) throws SQLException, IOException {
 
         connectToDB();
-        input();
-      TableSetup();
-        buyAndHold(selectedStock, startMoney, startDate,StockStrats.Hold);
-         cycleSimulationNormal(selectedStock,StockStrats.Cycle);
-        cycleSimulationWithPercent(selectedStock,StockStrats.Cycle3);
-      outPut();
+        char choise = choiseMethod();
+        System.out.println(choise);
+        if(choise =='a'){
+
+            InputMultipleStocks();
+            TableSetupAll(allStocks);
+            executeMultipleStocksAllStrategies(allStocks);
+            outputAllStocks(allStocks);
+        }else if(choise=='e'){
+
+            input();
+            TableSetup();
+            buyAndHold(selectedStock, startMoney, startDate,StockStrats.Hold);
+            cycleSimulationNormal(selectedStock,StockStrats.Cycle);
+            cycleSimulationWithPercent(selectedStock,StockStrats.Cycle3);
+            outPut();
+        }
+
+
+
 
 
     }
@@ -55,7 +69,7 @@ public class Program {
         //Aus Textfile verfügbare Aktien auslesen
         System.out.print("Your choice: ");
         selectedStock = reader.next().toLowerCase();
-        System.out.print("Seed capital: ");
+        System.out.print("Seed capital[$]: ");
         startMoney = reader.nextDouble();
         System.out.print("Start-date [yyyy-mm-dd]: ");
         startDate = LocalDate.parse(reader.next());
@@ -403,6 +417,90 @@ public class Program {
         calcProfit(selectedStock,StockStrats.Hold);
         calcProfit(selectedStock,StockStrats.Cycle);
         calcProfit(selectedStock,StockStrats.Cycle3);
+    }
+
+    public static void InputMultipleStocks() throws IOException {
+        OtherMethods.readStocksFromFile(allStocks);
+        System.out.println("Selected Shares:" + allStocks);
+        System.out.print("Available Money[$]: ");
+        startMoney = reader.nextDouble();
+        startMoney =startMoney/allStocks.size();
+        System.out.print("Start Date[yyyy/mm/dd]:");
+        startDate =  LocalDate.parse(reader.next());
+        StartDateMinusOne = startDate.minusDays(1);
+    }
+
+    public  static void calcProfitFromAll(ArrayList<String> Stocks, StockStrats strat){
+        double money=0, wholeMoneyTogether=0;
+        for(int i=0;i<Stocks.size()-1;i++){
+
+
+        String sql = "select * from "+Stocks.get(i)+"_sim_"+strat+" order by DateOfDay desc limit 1";
+
+        try{
+            Statement stmt = connection.createStatement();
+            ResultSet rs = stmt.executeQuery(sql);
+            while(rs.next()){
+                money = rs.getDouble("Money");
+            }
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+        wholeMoneyTogether = wholeMoneyTogether + money;
+
+        }
+        System.out.println("Nach der Simulation von "+usedStratName(strat)+" mit aufgeteiltes Geld auf den Aktien hast du "+(money/startMoney*Stocks.size()*100)+ " % vom Startkapital");
+
+    }
+
+    public static void executeMultipleStocksAllStrategies(ArrayList<String> Stocks){
+for(int i =0;i<Stocks.size()-1;i++){
+    buyAndHold(Stocks.get(i), startMoney, startDate,StockStrats.Hold);
+    cycleSimulationNormal(Stocks.get(i),StockStrats.Cycle);
+    cycleSimulationWithPercent(Stocks.get(i),StockStrats.Cycle3);
+}
+
+
+    }
+    public static void TableSetupAll(ArrayList<String> Stocks) throws SQLException {
+for(int i=0;i<Stocks.size()-1;i++){
+    createTable(Stocks.get(i),StockStrats.Hold);
+    createTable(Stocks.get(i),StockStrats.Cycle);
+    createTable(Stocks.get(i),StockStrats.Cycle3);
+    sillyDbEntry(Stocks.get(i), startMoney,StockStrats.Hold);
+    sillyDbEntry(Stocks.get(i), startMoney,StockStrats.Cycle);
+    sillyDbEntry(Stocks.get(i), startMoney,StockStrats.Cycle3);
+
+}
+    }
+
+    public static void outputAllStocks(ArrayList<String> Stocks){
+
+        calcProfitFromAll(Stocks,StockStrats.Hold);
+        calcProfitFromAll(Stocks,StockStrats.Cycle);
+        calcProfitFromAll(Stocks,StockStrats.Cycle3);
+
+    }
+
+    public static char choiseMethod(){
+        boolean corr=false;
+        System.out.println("Alle Aktien aufgeteiltmit alle Strategien oder eine Aktie mit allen Strategien: ");
+        System.out.println("Alle......a");
+        System.out.println("Eine......e");
+        char choise ='y';
+        do {
+            System.out.print("Entscheidung:");
+            choise = reader.next().toLowerCase().charAt(0);
+            choise= choise;
+            if(choise == 'a'){
+               return 'a';
+            }else if(choise=='e'){
+               return 'e';
+            }
+        }while(corr == false);
+
+return 'y';
     }
 }
 
