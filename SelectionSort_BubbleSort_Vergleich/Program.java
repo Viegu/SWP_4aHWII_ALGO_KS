@@ -12,8 +12,7 @@ public class Algo{
     public static int stableselectionS[] = new int[1000];
     public static int insertionArray[] = new int[1000];
     public static int qsArray[]= new int[1000];
-
-
+    
     public static ArrayList<Integer> bubbleSortVergleiche = new ArrayList<Integer>();
     public static ArrayList<Integer> bubbleSortTausche = new ArrayList<Integer>();
     public static ArrayList<Long> bubbleSortTime = new ArrayList<Long>();
@@ -33,7 +32,6 @@ public class Algo{
     public static ArrayList<Integer> QSVergleich = new ArrayList<Integer>();
     public static ArrayList<Integer> QSTausch = new ArrayList<Integer>();
     public static ArrayList<Long> QSTime = new ArrayList<Long>();
-
 
     public static int vglbs = 0;
     public static int swapbs = 0;
@@ -69,79 +67,8 @@ public class Algo{
     public static long qstime;
 
     public static void main(String[] args) {
-        for (int i = 0; i < 100; i++) {
-            makeArrays();
-            bubblesort(bubbleArray);
-            selectionSort(selectionS);
-            stableSelectionSort(stableselectionS);
-            insertionSort(insertionArray);
-            startTime = System.nanoTime();
-            quickSort(qsArray, 0,qsArray.length-1);
-            endTime = System.nanoTime();
-            time = endTime - startTime;
-            QSTime.add(time);
-            startTime = 0;
-            endTime = 0;
-            time = 0;
-
-            bubbleSortVergleiche.add(vglbs);
-
-            bubbleSortTausche.add(swapbs);
-            selectionSortVergleiche.add(vglss);
-            selectionSortTausche.add(swapss);
-            stableselectionSortVergleiche.add(vglsss);
-            stableselectionSortTausche.add(swapsss);
-            InsertionSortTausch.add(swapis);
-            InsertionSortVergleich.add(vglis);
-            QSTausch.add(qsswap);
-            QSVergleich.add(qsvgl);
-            clearIt();
-
-
-
-        }
-        calcavg();
-        Collections.sort(bubbleSortTausche);
-        Collections.sort(selectionSortTausche);
-        Collections.sort(stableselectionSortTausche);
-        Collections.sort(InsertionSortTausch);
-
-        System.out.println("Durchschnittstausche Bubblesort: " + bbsDurchschnitttausche);
-        System.out.println("Durchschnittsvergleiche Bubblesort: " + bbsDurchschnittvergl);
-        System.out.println("Median Tausche Bubblesort: " + bubbleSortTausche.get((bubbleSortTausche.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + bbstime);
-        System.out.println(" ");
-        System.out.println("Durchschnittstausche SelectionSort: " + ssDurchschnitttausche);
-        System.out.println("Durchschnittsvergleiche SelectionSort: " + ssDurchschnittvergl);
-        System.out.println("Median Tausche Selectionsort: " + selectionSortTausche.get((selectionSortTausche.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + sstime);
-        System.out.println(" ");
-        System.out.println("Durchschnittstausche StableSelectionSort: " + stablessDurchschnitttausche);
-        System.out.println("Durchschnittsvergleiche StableSelectionSort: " + stablessDurchschnittvergl);
-        System.out.println("Median Tausche StableSelectionsort: " + stableselectionSortTausche.get((stableselectionSortTausche.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + ssstime);
-        System.out.println("");
-        System.out.println("Durchschnittstausche InsertionSort: " + insertionsorttausche);
-        System.out.println("Durchschnittsvergleiche Insertionsort: " + insertionsortvergl);
-        System.out.println("Median Tausche Insertionsort: " + InsertionSortTausch.get((InsertionSortTausch.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + istime);
-        System.out.println("");
-        System.out.println("Durchschnittstausche Quicksort: " + qstausche);
-        System.out.println("Durchschnittsvergleiche Quicksort: " + qsvergleiche);
-        System.out.println("keine Ahnung wie das geht ");
-        //System.out.println("Median Tausche Insertionsort: " + InsertionSortTausch.get((InsertionSortTausch.size() / 2)));
-        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + qstime);
-        //System.out.println(InsertionSortTausch);
-        // System.out.println(InsertionSortVergleich);
-
-
-
-
-
-        //  for(int i =0;i<ssDurchschnitttausche)
-        // System.out.println(bubbleSortTausche);
-
-
+    inputCycle();
+    output();
     }
 
 
@@ -271,6 +198,7 @@ public class Algo{
     }
     static void swap(int[] arr, int i, int j)
     {
+        qsswap++;
         int temp = arr[i];
         arr[i] = arr[j];
         arr[j] = temp;
@@ -303,7 +231,7 @@ public class Algo{
 
     static void quickSort(int[] arr, int low, int high)
     {
-
+        qsvgl++;
         if (low < high)
         {
 
@@ -382,12 +310,12 @@ public class Algo{
 
         //Quicksort
         for(int i=0;i< QSVergleich.size();i++){
-            tempvar = tempvar/QSVergleich.get(i);
+            tempvar = tempvar+QSVergleich.get(i);
         }
         qsvergleiche = tempvar/QSVergleich.size();
         tempvar=0;
         for(int i=0;i< QSTausch.size();i++){
-            tempvar = tempvar/QSTausch.get(i);
+            tempvar = tempvar+QSTausch.get(i);
         }
         qstausche = tempvar/QSTausch.size();
         tempvar=0;
@@ -447,5 +375,68 @@ public class Algo{
 
         qsswap=0;
         qsvgl=0;
+    }
+    public static void output(){
+        System.out.println("Durchschnittstausche Bubblesort: " + bbsDurchschnitttausche);
+        System.out.println("Durchschnittsvergleiche Bubblesort: " + bbsDurchschnittvergl);
+        System.out.println("Median Tausche Bubblesort: " + bubbleSortTausche.get((bubbleSortTausche.size() / 2)));
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + bbstime);
+        System.out.println(" ");
+        System.out.println("Durchschnittstausche SelectionSort: " + ssDurchschnitttausche);
+        System.out.println("Durchschnittsvergleiche SelectionSort: " + ssDurchschnittvergl);
+        System.out.println("Median Tausche Selectionsort: " + selectionSortTausche.get((selectionSortTausche.size() / 2)));
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + sstime);
+        System.out.println(" ");
+        System.out.println("Durchschnittstausche StableSelectionSort: " + stablessDurchschnitttausche);
+        System.out.println("Durchschnittsvergleiche StableSelectionSort: " + stablessDurchschnittvergl);
+        System.out.println("Median Tausche StableSelectionsort: " + stableselectionSortTausche.get((stableselectionSortTausche.size() / 2)));
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + ssstime);
+        System.out.println("");
+        System.out.println("Durchschnittstausche InsertionSort: " + insertionsorttausche);
+        System.out.println("Durchschnittsvergleiche Insertionsort: " + insertionsortvergl);
+        System.out.println("Median Tausche Insertionsort: " + InsertionSortTausch.get((InsertionSortTausch.size() / 2)));
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + istime);
+        System.out.println("");
+        System.out.println("Durchschnittstausche Quicksort: " + qstausche);
+        System.out.println("Durchschnittsvergleiche Quicksort: " + qsvergleiche);
+        System.out.println("Benötigte Durchschnittszeit(Nanosekunden): " + qstime);
+    }
+    public static void inputCycle(){
+        for (int i = 0; i < 100; i++) {
+            makeArrays();
+            bubblesort(bubbleArray);
+            selectionSort(selectionS);
+            stableSelectionSort(stableselectionS);
+            insertionSort(insertionArray);
+            startTime = System.nanoTime();
+            quickSort(qsArray, 0,qsArray.length-1);
+            endTime = System.nanoTime();
+            time = endTime - startTime;
+            QSTime.add(time);
+            startTime = 0;
+            endTime = 0;
+            time = 0;
+
+            bubbleSortVergleiche.add(vglbs);
+
+            bubbleSortTausche.add(swapbs);
+            selectionSortVergleiche.add(vglss);
+            selectionSortTausche.add(swapss);
+            stableselectionSortVergleiche.add(vglsss);
+            stableselectionSortTausche.add(swapsss);
+            InsertionSortTausch.add(swapis);
+            InsertionSortVergleich.add(vglis);
+            QSTausch.add(qsswap);
+            QSVergleich.add(qsvgl);
+            clearIt();
+
+
+
+        }
+        calcavg();
+        Collections.sort(bubbleSortTausche);
+        Collections.sort(selectionSortTausche);
+        Collections.sort(stableselectionSortTausche);
+        Collections.sort(InsertionSortTausch);
     }
 }
